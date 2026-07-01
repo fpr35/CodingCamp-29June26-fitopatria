@@ -1,0 +1,414 @@
+<!DOCTYPE html>
+<html lang="id">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Dashboard produktivitas harian: Greeting, Focus Timer, To-Do List, dan Quick Links."
+    />
+    <title>To-Do List Life Dashboard</title>
+    <!-- Requirements 12.2: tepat satu file CSS di /css/ -->
+    <link rel="stylesheet" href="css/style.css" />
+  </head>
+
+  <body>
+
+    <!-- =================================================================
+         BANNER PERINGATAN — LocalStorage tidak tersedia
+         Ditampilkan oleh StorageManager.init() jika localStorage
+         tidak dapat diakses (misal: mode incognito yang memblokir storage)
+         Requirements: 11.4
+         ================================================================= -->
+    <div
+      id="storage-warning"
+      class="storage-warning"
+      role="alert"
+      aria-live="assertive"
+      hidden
+    >
+      ⚠️ Data tidak dapat disimpan secara permanen. Browser Anda membatasi
+      akses penyimpanan lokal.
+    </div>
+
+    <!-- =================================================================
+         SITE HEADER — Judul dan Greeting Widget
+         Requirements: 1.1, 1.2, 1.3–1.8
+         ================================================================= -->
+    <header class="site-header">
+      <div class="site-header__brand">
+        <h1 class="site-title">Life Dashboard</h1>
+      </div>
+
+      <button
+        type="button"
+        id="theme-toggle-btn"
+        class="btn btn--secondary theme-toggle"
+        aria-label="Beralih ke mode terang"
+      >
+        ☀️ Light
+      </button>
+
+      <!-- Widget Greeting: waktu, tanggal, dan sapaan dinamis -->
+      <section
+        class="widget--greeting"
+        aria-label="Sapaan dan Waktu"
+      >
+        <!-- Waktu saat ini dalam format HH:MM (24-jam) -->
+        <p
+          id="greeting-time"
+          class="greeting-time"
+          aria-label="Waktu saat ini"
+          aria-live="off"
+        >
+          --:--
+        </p>
+
+        <!-- Tanggal lengkap: nama hari, tanggal, nama bulan, tahun -->
+        <p
+          id="greeting-date"
+          class="greeting-date"
+          aria-label="Tanggal hari ini"
+          aria-live="off"
+        >
+          Memuat tanggal...
+        </p>
+
+        <!-- Teks sapaan berdasarkan waktu + nama pengguna (jika ada) -->
+        <p
+          id="greeting-text"
+          class="greeting-text"
+          aria-label="Sapaan"
+          aria-live="polite"
+        >
+          Selamat Datang
+        </p>
+      </section>
+    </header>
+
+    <!-- =================================================================
+         MAIN — Area konten utama dashboard (SPA, satu halaman)
+         Requirements: 12.4
+         ================================================================= -->
+    <main class="dashboard-grid" id="main-content">
+
+      <!-- ===============================================================
+           WIDGET: Kustomisasi Nama Pengguna
+           DOM Elements: #username-input, #username-save-btn,
+                         #username-error, #username-success
+           Requirements: 2.1–2.6
+           =============================================================== -->
+      <section
+        class="widget widget--username"
+        aria-label="Kustomisasi Nama Pengguna"
+      >
+        <header class="widget__header">
+          <h2 class="widget__title">Nama Saya</h2>
+        </header>
+
+        <div class="widget__body">
+          <div class="form-group">
+            <label for="username-input" class="form-label">
+              Nama Pengguna
+            </label>
+            <div class="input-row">
+              <input
+                type="text"
+                id="username-input"
+                class="form-input"
+                name="username"
+                maxlength="50"
+                placeholder="Masukkan nama Anda..."
+                autocomplete="off"
+                aria-describedby="username-error username-success"
+              />
+              <button
+                type="button"
+                id="username-save-btn"
+                class="btn btn--primary"
+                aria-label="Simpan nama pengguna"
+              >
+                Simpan
+              </button>
+            </div>
+          </div>
+
+          <!-- Pesan kesalahan validasi nama (misal: > 50 karakter) -->
+          <p
+            id="username-error"
+            class="message message--error"
+            role="alert"
+            aria-live="assertive"
+            hidden
+          >
+            Nama tidak boleh melebihi 50 karakter
+          </p>
+
+          <!-- Konfirmasi sukses penyimpanan nama -->
+          <p
+            id="username-success"
+            class="message message--success"
+            role="status"
+            aria-live="polite"
+            hidden
+          >
+            Nama berhasil disimpan!
+          </p>
+        </div>
+      </section>
+
+      <!-- ===============================================================
+           WIDGET: Focus Timer (Pomodoro)
+           DOM Elements: #timer-display, #timer-start-btn,
+                         #timer-pause-btn, #timer-reset-btn,
+                         #timer-notification-fallback
+           Requirements: 3.1–3.8, 4.6
+           =============================================================== -->
+      <section
+        class="widget widget--timer"
+        aria-label="Focus Timer Pomodoro"
+      >
+        <header class="widget__header">
+          <h2 class="widget__title">Focus Timer</h2>
+        </header>
+
+        <div class="widget__body">
+          <!-- Tampilan hitungan mundur MM:SS -->
+          <div
+            id="timer-display"
+            class="timer-display"
+            role="timer"
+            aria-label="Waktu tersisa"
+            aria-live="off"
+          >
+            25:00
+          </div>
+
+          <!-- Kontrol timer: Mulai / Jeda / Reset -->
+          <div
+            class="timer-controls"
+            role="group"
+            aria-label="Kontrol timer"
+          >
+            <button
+              type="button"
+              id="timer-start-btn"
+              class="btn btn--success"
+              aria-label="Mulai timer"
+            >
+              Mulai
+            </button>
+            <button
+              type="button"
+              id="timer-pause-btn"
+              class="btn btn--warning"
+              disabled
+              aria-label="Jeda timer"
+            >
+              Jeda
+            </button>
+            <button
+              type="button"
+              id="timer-reset-btn"
+              class="btn btn--secondary"
+              aria-label="Reset timer ke 25 menit"
+            >
+              Reset
+            </button>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- ===============================================================
+           WIDGET: To-Do List
+           DOM Elements: #todo-input, #todo-add-btn,
+                         #todo-list, #todo-error
+           Requirements: 5.1–5.8, 6.1–6.6, 7.1–7.6, 8.1–8.7
+           =============================================================== -->
+      <section
+        class="widget widget--todo"
+        aria-label="Daftar Tugas"
+      >
+        <header class="widget__header">
+          <h2 class="widget__title">To-Do List</h2>
+        </header>
+
+        <div class="widget__body">
+          <!-- Form tambah tugas baru -->
+          <div class="form-group">
+            <label for="todo-input" class="form-label">
+              Tambah Tugas Baru
+            </label>
+            <div class="input-row">
+              <input
+                type="text"
+                id="todo-input"
+                class="form-input"
+                name="todo"
+                maxlength="200"
+                placeholder="Ketik tugas baru dan tekan Enter..."
+                autocomplete="off"
+                aria-describedby="todo-error"
+              />
+              <button
+                type="button"
+                id="todo-add-btn"
+                class="btn btn--primary"
+                aria-label="Tambahkan tugas baru ke daftar"
+              >
+                Tambah
+              </button>
+            </div>
+          </div>
+
+          <!-- Pesan kesalahan validasi input tugas -->
+          <p
+            id="todo-error"
+            class="message message--error"
+            role="alert"
+            aria-live="assertive"
+            hidden
+          >
+            Tugas tidak boleh kosong
+          </p>
+
+          <!-- Daftar tugas — diisi secara dinamis oleh TodoModule.renderAll()
+               Setiap <li> berisi: checkbox, teks, Drag Handle (≡),
+               tombol Edit, dan tombol Hapus -->
+          <ul
+            id="todo-list"
+            class="todo-list"
+            aria-label="Daftar tugas Anda"
+            aria-live="polite"
+          >
+            <!-- Item tugas dirender secara dinamis oleh JavaScript -->
+          </ul>
+        </div>
+      </section>
+
+      <!-- ===============================================================
+           WIDGET: Quick Links
+           DOM Elements: #link-name-input, #link-url-input, #link-add-btn,
+                         #link-name-error, #link-url-error,
+                         #quick-links-list, #quick-links-empty
+           Requirements: 9.1–9.8, 10.1–10.4
+           =============================================================== -->
+      <section
+        class="widget widget--quicklinks"
+        aria-label="Quick Links"
+      >
+        <header class="widget__header">
+          <h2 class="widget__title">Quick Links</h2>
+        </header>
+
+        <div class="widget__body">
+          <!-- Form tambah link baru -->
+          <div class="quicklinks-form">
+            <!-- Field: Nama Link -->
+            <div class="form-group">
+              <label for="link-name-input" class="form-label">
+                Nama Link
+              </label>
+              <input
+                type="text"
+                id="link-name-input"
+                class="form-input"
+                name="link-name"
+                maxlength="50"
+                placeholder="Contoh: GitHub"
+                autocomplete="off"
+                aria-describedby="link-name-error"
+              />
+              <!-- Pesan kesalahan validasi nama link -->
+              <p
+                id="link-name-error"
+                class="message message--error"
+                role="alert"
+                aria-live="assertive"
+                hidden
+              >
+                Nama link tidak boleh kosong
+              </p>
+            </div>
+
+            <!-- Field: URL -->
+            <div class="form-group">
+              <label for="link-url-input" class="form-label">
+                URL
+              </label>
+              <input
+                type="url"
+                id="link-url-input"
+                class="form-input"
+                name="link-url"
+                maxlength="500"
+                placeholder="https://contoh.com"
+                autocomplete="off"
+                aria-describedby="link-url-error"
+              />
+              <!-- Pesan kesalahan validasi URL -->
+              <p
+                id="link-url-error"
+                class="message message--error"
+                role="alert"
+                aria-live="assertive"
+                hidden
+              >
+                URL harus diawali dengan http:// atau https://
+              </p>
+            </div>
+
+            <button
+              type="button"
+              id="link-add-btn"
+              class="btn btn--primary"
+              aria-label="Tambahkan quick link baru"
+            >
+              Tambah Link
+            </button>
+          </div>
+
+          <!-- Pesan kosong — ditampilkan saat koleksi link kosong
+               Requirements: 10.4 -->
+          <p
+            id="quick-links-empty"
+            class="quick-links-empty"
+            aria-live="polite"
+          >
+            Belum ada link yang disimpan. Tambahkan link pertama Anda!
+          </p>
+
+          <!-- Daftar quick links — diisi secara dinamis oleh
+               QuickLinksModule.renderAll()
+               Setiap <li> berisi: <a target="_blank" rel="noopener noreferrer">
+               dan tombol Hapus -->
+          <ul
+            id="quick-links-list"
+            class="quick-links-list"
+            aria-label="Daftar quick links Anda"
+            aria-live="polite"
+          >
+            <!-- Item link dirender secara dinamis oleh JavaScript -->
+          </ul>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- =================================================================
+         SITE FOOTER
+         ================================================================= -->
+    <footer class="site-footer">
+      <p class="footer-text">
+        To-Do List Life Dashboard &copy; 2024 &mdash;
+        Dibuat dengan Vanilla HTML, CSS &amp; JavaScript
+      </p>
+    </footer>
+
+    <!-- Requirements 12.3: tepat satu file JS di /js/
+         defer memastikan script berjalan setelah seluruh DOM selesai diparsing -->
+    <script src="js/app.js" defer></script>
+
+  </body>
+</html>

@@ -1,0 +1,625 @@
+/* ==========================================================================
+   To-Do List Life Dashboard — Main Stylesheet
+   File: css/style.css
+   Requirements: 12.2 — tepat satu file CSS di direktori /css/
+   ==========================================================================
+
+   Daftar isi:
+   1. CSS Reset & Base Styles
+   2. CSS Custom Properties (Variables)
+   3. Storage Warning Banner
+   4. Site Header
+   5. Greeting Widget
+   6. Dashboard Grid & Widget Base
+   7. Forms & Buttons (shared)
+   8. Focus Timer
+   9. To-Do List
+   10. Quick Links
+   11. Footer
+   12. Responsive Design (Media Queries)
+   ========================================================================== */
+
+
+/* ==========================================================================
+   1. CSS Reset & Base Styles
+   ========================================================================== */
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background: var(--color-bg);
+  color: var(--color-text);
+  min-height: 100vh;
+  line-height: 1.6;
+}
+
+
+/* ==========================================================================
+   2. CSS Custom Properties (Variables)
+   ========================================================================== */
+
+/* Dark theme (default) */
+:root,
+[data-theme="dark"] {
+  --color-bg: #1a1a2e;
+  --color-surface: #16213e;
+  --color-card: #0f3460;
+  --color-accent: #e94560;
+  --color-accent-hover: #c73652;
+  --color-success: #4ecca3;
+  --color-warning: #f7b731;
+  --color-text: #eaeaea;
+  --color-text-muted: #a0aec0;
+  --color-error: #fc8181;
+  --border-radius: 12px;
+  --shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  --transition: 0.2s ease;
+}
+
+/* Light theme */
+[data-theme="light"] {
+  --color-bg: #f0f4f8;
+  --color-surface: #ffffff;
+  --color-card: #e8edf2;
+  --color-accent: #c0392b;
+  --color-accent-hover: #a93226;
+  --color-success: #1a936f;
+  --color-warning: #d68910;
+  --color-text: #1a202c;
+  --color-text-muted: #4a5568;
+  --color-error: #c0392b;
+  --border-radius: 12px;
+  --shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  --transition: 0.2s ease;
+}
+
+
+/* ==========================================================================
+   3. Storage Warning Banner
+   Requirements: 11.4
+   ========================================================================== */
+
+.storage-warning {
+  background: var(--color-error);
+  color: #fff;
+  padding: 0.75rem 1rem;
+  text-align: center;
+  font-size: 0.875rem;
+  font-weight: 600;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+
+/* ==========================================================================
+   4. Site Header
+   ========================================================================== */
+
+.site-header {
+  background: var(--color-surface);
+  padding: 1.5rem 2rem;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  box-shadow: var(--shadow);
+}
+
+.site-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: var(--color-accent);
+  letter-spacing: 0.05em;
+}
+
+
+/* ==========================================================================
+   5. Greeting Widget (dalam header)
+   Requirements: 1.1, 1.2, 1.3–1.8
+   ========================================================================== */
+
+/* Override semua .widget styles — greeting bukan card, hanya teks di header */
+.widget--greeting {
+  background: transparent;
+  border-radius: 0;
+  box-shadow: none;
+  overflow: visible;
+  text-align: right;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 0.1rem;
+}
+
+#greeting-time {
+  font-size: 2.4rem;
+  font-weight: 800;
+  color: var(--color-accent);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.01em;
+}
+
+#greeting-date {
+  font-size: 0.8rem;
+  color: var(--color-text-muted);
+  line-height: 1.4;
+}
+
+#greeting-text {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: var(--color-text);
+  line-height: 1.3;
+}
+
+
+/* ==========================================================================
+   6. Dashboard Grid & Widget Base
+   Requirements: 12.4
+   ========================================================================== */
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+  gap: 1.5rem;
+  padding: 1.5rem 2rem;
+}
+
+.widget {
+  background: var(--color-card);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+
+.widget__header {
+  background: var(--color-surface);
+  padding: 1rem 1.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.widget__title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.widget__body {
+  padding: 1.5rem;
+}
+
+
+/* ==========================================================================
+   7. Forms & Buttons (shared)
+   ========================================================================== */
+
+.form-group {
+  margin-bottom: 1rem;
+}
+
+.form-label {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--color-text-muted);
+  margin-bottom: 0.4rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.form-input {
+  width: 100%;
+  padding: 0.6rem 0.9rem;
+  background: var(--color-surface);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  color: var(--color-text);
+  font-size: 0.95rem;
+  transition: border-color var(--transition);
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: var(--color-accent);
+}
+
+.input-row {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.input-row .form-input {
+  flex: 1;
+}
+
+.btn {
+  padding: 0.6rem 1.2rem;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--transition), opacity var(--transition);
+  white-space: nowrap;
+}
+
+.btn--primary {
+  background: var(--color-accent);
+  color: #fff;
+}
+
+.btn--primary:hover {
+  background: var(--color-accent-hover);
+}
+
+.btn--success {
+  background: var(--color-success);
+  color: #1a1a2e;
+}
+
+.btn--success:hover {
+  filter: brightness(1.1);
+}
+
+.btn--warning {
+  background: var(--color-warning);
+  color: #1a1a2e;
+}
+
+.btn--warning:hover {
+  filter: brightness(1.1);
+}
+
+.btn--secondary {
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--color-text);
+}
+
+.btn--secondary:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.message {
+  font-size: 0.8rem;
+  margin-top: 0.4rem;
+}
+
+.message--error {
+  color: var(--color-error);
+}
+
+.message--success {
+  color: var(--color-success);
+}
+
+
+/* ==========================================================================
+   8. Focus Timer
+   Requirements: 3.1–3.8, 4.6
+   ========================================================================== */
+
+.widget--timer .widget__body {
+  text-align: center;
+}
+
+#timer-display {
+  font-size: 5rem;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  font-family: 'Courier New', Courier, monospace;
+  color: var(--color-accent);
+  letter-spacing: 0.05em;
+  line-height: 1;
+  margin: 1rem 0;
+}
+
+.timer-controls {
+  display: flex;
+  justify-content: center;
+  gap: 0.75rem;
+  margin-top: 1rem;
+}
+
+#timer-notification-fallback {
+  margin-top: 1rem;
+  padding: 0.75rem 1rem;
+  background: rgba(78, 204, 163, 0.15);
+  border: 1px solid var(--color-success);
+  border-radius: 8px;
+  color: var(--color-success);
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+
+/* ==========================================================================
+   9. To-Do List
+   Requirements: 5.1–5.8, 6.1–6.6, 7.1–7.6, 8.1–8.7
+   ========================================================================== */
+
+.todo-list {
+  list-style: none;
+  padding: 0;
+  margin-top: 1rem;
+}
+
+.todo-list li[data-id] {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.65rem 0.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  transition: background var(--transition);
+}
+
+.todo-list li[data-id]:last-child {
+  border-bottom: none;
+}
+
+.todo-list li[data-id]:hover {
+  background: rgba(255, 255, 255, 0.04);
+  border-radius: 6px;
+}
+
+.drag-handle {
+  cursor: grab;
+  color: var(--color-text-muted);
+  font-size: 1.1rem;
+  padding: 0 0.2rem;
+  flex-shrink: 0;
+  user-select: none;
+}
+
+.drag-handle:active {
+  cursor: grabbing;
+}
+
+.task-checkbox {
+  width: 1.1rem;
+  height: 1.1rem;
+  flex-shrink: 0;
+  cursor: pointer;
+  accent-color: var(--color-success);
+}
+
+.task-text {
+  flex: 1;
+  font-size: 0.95rem;
+  color: var(--color-text);
+  word-break: break-word;
+}
+
+.task-text.completed {
+  text-decoration: line-through;
+  opacity: 0.5;
+  color: var(--color-text-muted);
+}
+
+.task-actions {
+  display: flex;
+  gap: 0.4rem;
+  flex-shrink: 0;
+}
+
+.btn-edit {
+  padding: 0.3rem 0.7rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  background: rgba(99, 179, 237, 0.2);
+  color: #63b3ed;
+  transition: background var(--transition);
+}
+
+.btn-edit:hover {
+  background: rgba(99, 179, 237, 0.35);
+}
+
+.btn-delete {
+  padding: 0.3rem 0.7rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  background: rgba(252, 129, 129, 0.2);
+  color: var(--color-error);
+  transition: background var(--transition);
+}
+
+.btn-delete:hover {
+  background: rgba(252, 129, 129, 0.35);
+}
+
+.task-edit-input {
+  flex: 1;
+  padding: 0.4rem 0.7rem;
+  background: var(--color-surface);
+  border: 1px solid var(--color-accent);
+  border-radius: 6px;
+  color: var(--color-text);
+  font-size: 0.9rem;
+}
+
+.task-edit-input:focus {
+  outline: none;
+}
+
+.btn-save-edit {
+  padding: 0.3rem 0.7rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  background: rgba(78, 204, 163, 0.2);
+  color: var(--color-success);
+}
+
+.btn-save-edit:hover {
+  background: rgba(78, 204, 163, 0.35);
+}
+
+.btn-cancel-edit {
+  padding: 0.3rem 0.7rem;
+  font-size: 0.78rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--color-text-muted);
+}
+
+.btn-cancel-edit:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.todo-list li.drag-over {
+  background: rgba(233, 69, 96, 0.15);
+  border-radius: 6px;
+  outline: 2px dashed var(--color-accent);
+}
+
+
+/* ==========================================================================
+   10. Quick Links
+   Requirements: 9.1–9.8, 10.1–10.4
+   ========================================================================== */
+
+.quicklinks-form {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+}
+
+#quick-links-empty {
+  color: var(--color-text-muted);
+  text-align: center;
+  padding: 1.5rem 0;
+  font-style: italic;
+  font-size: 0.9rem;
+}
+
+.quick-links-list {
+  list-style: none;
+  padding: 0;
+  margin-top: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.quick-link-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.6rem 0.8rem;
+  background: var(--color-surface);
+  border-radius: 8px;
+  gap: 0.5rem;
+}
+
+.quick-link-anchor {
+  color: var(--color-accent);
+  text-decoration: none;
+  font-size: 0.9rem;
+  font-weight: 500;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.quick-link-anchor:hover {
+  text-decoration: underline;
+}
+
+.btn-delete-link {
+  padding: 0.25rem 0.6rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  background: rgba(252, 129, 129, 0.2);
+  color: var(--color-error);
+  flex-shrink: 0;
+  transition: background var(--transition);
+}
+
+.btn-delete-link:hover {
+  background: rgba(252, 129, 129, 0.35);
+}
+
+
+/* ==========================================================================
+   11. Footer
+   ========================================================================== */
+
+.site-footer {
+  text-align: center;
+  padding: 1.5rem;
+  color: var(--color-text-muted);
+  font-size: 0.8rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.06);
+}
+
+
+/* ==========================================================================
+   12. Responsive Design (Media Queries)
+   ========================================================================== */
+
+@media (max-width: 768px) {
+  .site-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .widget--greeting {
+    text-align: left;
+    align-items: flex-start;
+    width: 100%;
+  }
+
+  #greeting-time {
+    font-size: 1.8rem;
+  }
+
+  #greeting-text {
+    font-size: 1rem;
+  }
+
+  #timer-display {
+    font-size: 3.5rem;
+  }
+
+  .dashboard-grid {
+    padding: 1rem;
+    gap: 1rem;
+    grid-template-columns: 1fr;
+  }
+
+  .timer-controls {
+    flex-wrap: wrap;
+  }
+}
