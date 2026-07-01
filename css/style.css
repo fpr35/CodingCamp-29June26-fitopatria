@@ -121,6 +121,14 @@ body {
   letter-spacing: 0.05em;
 }
 
+.theme-toggle {
+  font-size: 0.82rem;
+  padding: 0.45rem 0.9rem;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  letter-spacing: 0.02em;
+}
+
 
 /* ==========================================================================
    5. Greeting Widget (dalam header)

@@ -2,7 +2,7 @@
 
 ## Overview
 
-Implementasi dashboard produktivitas harian single-page berbasis Vanilla HTML, CSS, dan JavaScript murni. Tidak ada framework atau library eksternal — hanya tiga file inti (`index.html`, `css/style.css`, `js/app.js`). Urutan implementasi mengikuti alur dependency: struktur file → modul storage → widget greeting + nama → focus timer + notifikasi → todo list → quick links → pengujian.
+Implementasi dashboard produktivitas harian single-page berbasis Vanilla HTML, CSS, dan JavaScript murni. Tidak ada framework atau library eksternal — hanya tiga file inti (`index.html`, `css/style.css`, `js/app.js`). Urutan implementasi mengikuti alur dependency: struktur file → modul storage → widget greeting + nama → focus timer + tema light/dark → todo list → quick links → pengujian.
 
 ---
 
@@ -86,7 +86,7 @@ Implementasi dashboard produktivitas harian single-page berbasis Vanilla HTML, C
     - Implementasikan `TimerModule.start()` — jalankan `setInterval(tick, 1000)`, aktifkan `#timer-pause-btn` dengan atribut `disabled` pada `#timer-start-btn`
     - Implementasikan `TimerModule.pause()` — `clearInterval`, simpan `remaining`, kembalikan state tombol (aktifkan `#timer-start-btn`, nonaktifkan `#timer-pause-btn`)
     - Implementasikan `TimerModule.reset()` — `clearInterval`, set `remaining = 1500`, update DOM ke "25:00", kembalikan semua tombol ke kondisi awal
-    - Implementasikan `TimerModule.tick()` — kurangi `remaining` satu detik, update `#timer-display`; jika `remaining === 0` panggil `clearInterval` dan `NotificationModule.notify()`
+    - Implementasikan `TimerModule.tick()` — kurangi `remaining` satu detik, update `#timer-display`; jika `remaining === 0` panggil `clearInterval`
     - _Requirements: 3.1, 3.2, 3.3, 3.4, 3.5, 3.6, 3.7, 3.8_
 
   - [ ]* 6.2 Tulis property test untuk TimerModule — Property 16
@@ -103,23 +103,20 @@ Implementasi dashboard produktivitas harian single-page berbasis Vanilla HTML, C
     - _Requirements: 3.1, 3.4, 3.5_
 
 
-- [x] 7. Implementasi Notifikasi dan Alarm
-  - [x] 7.1 Tulis modul `NotificationModule` di dalam `js/app.js`
-    - Implementasikan `NotificationModule.init()` — periksa dukungan `Notification` API (`typeof Notification !== 'undefined'`) dan `AudioContext`; simpan flag dukungan
-    - Implementasikan `NotificationModule.requestPermission()` — panggil `Notification.requestPermission()` dan kembalikan Promise; dipanggil oleh `TimerModule.start()` saat pertama kali timer dimulai dan `permission === 'default'`
-    - Implementasikan `NotificationModule.playAudio()` — buat `AudioContext`, buat `OscillatorNode` dengan frekuensi sinyal alarm (misalnya 800Hz), putar minimal 3 detik; tangkap `DOMException` (kebijakan autoplay) dan panggil `showVisualFallback()`
-    - Implementasikan `NotificationModule.showNotification()` — jika `permission === 'granted'`, buat `new Notification('Sesi Fokus Selesai!', { body: 'Waktunya istirahat sejenak.' })`, tutup otomatis setelah 5000ms
-    - Implementasikan `NotificationModule.showVisualFallback()` — tampilkan pesan "Sesi selesai! Silakan ambil istirahat." di elemen DOM (buat elemen fallback di HTML jika perlu)
-    - Implementasikan `NotificationModule.notify()` — selalu panggil `playAudio()`, kemudian `showNotification()` jika didukung
-    - _Requirements: 4.1, 4.2, 4.3, 4.4, 4.5, 4.6_
+- [x] 7. Implementasi Tema Light & Dark Mode
+  - [x] 7.1 Tulis modul `ThemeModule` di dalam `js/app.js`
+    - Implementasikan `ThemeModule.applyTheme(theme)` — set atribut `data-theme` pada `<html>`, update label tombol `#theme-toggle-btn`
+    - Implementasikan `ThemeModule.toggle()` — baca tema aktif dari `data-theme`, beralih ke tema sebaliknya, simpan ke localStorage via `StorageManager.set('theme', ...)`
+    - Implementasikan `ThemeModule.init()` — baca `StorageManager.get('theme')`; jika tidak ada, deteksi `window.matchMedia('(prefers-color-scheme: dark)')` sebagai fallback; panggil `applyTheme()`; pasang event listener pada `#theme-toggle-btn`
+    - _Requirements: 4.1, 4.2, 4.3, 4.4, 4.5, 4.6, 4.7, 4.8_
 
-  - [ ]* 7.2 Tulis unit test untuk NotificationModule
-    - Mock `Notification` API dan `AudioContext`
-    - Uji: jika `permission === 'granted'` → `showNotification()` dipanggil
-    - Uji: jika `permission === 'denied'` → hanya `playAudio()`, `showNotification()` tidak dipanggil
-    - Uji: jika `Notification` tidak ada (`typeof Notification === 'undefined'`) → hanya `playAudio()`
-    - Uji: jika `playAudio()` melempar `DOMException` → `showVisualFallback()` dipanggil
-    - _Requirements: 4.2, 4.4, 4.5, 4.6_
+  - [ ]* 7.2 Tulis unit test untuk ThemeModule
+    - Mock `localStorage` dan `window.matchMedia`
+    - Uji: toggle dari dark → light mengubah `data-theme` dan menyimpan ke localStorage
+    - Uji: toggle dari light → dark mengubah `data-theme` dan menyimpan ke localStorage
+    - Uji: init membaca nilai dari localStorage jika tersedia
+    - Uji: init menggunakan preferensi OS jika localStorage kosong
+    - _Requirements: 4.3, 4.4, 4.5_
 
 - [x] 8. Checkpoint — Pastikan semua tes lulus
   - Pastikan semua tes lulus, tanyakan kepada pengguna jika ada pertanyaan.
@@ -284,7 +281,7 @@ Implementasi dashboard produktivitas harian single-page berbasis Vanilla HTML, C
     - Panggil `GreetingModule.init()`
     - Panggil `UserNameModule.init()`
     - Panggil `TimerModule.init()`
-    - Panggil `NotificationModule.init()`
+    - Panggil `ThemeModule.init()`
     - Panggil `TodoModule.init()`
     - Panggil `QuickLinksModule.init()`
     - Pastikan tidak ada error di console pada browser modern (Chrome, Firefox, Edge, Safari terbaru)
@@ -303,7 +300,7 @@ Implementasi dashboard produktivitas harian single-page berbasis Vanilla HTML, C
 - Property tests menggunakan [fast-check](https://fast-check.dev/) dengan minimal 100 iterasi per properti
 - Unit tests menggunakan [Vitest](https://vitest.dev/) dengan jsdom environment
 - `localStorage` di-mock menggunakan `vi.stubGlobal` — tidak mengakses storage nyata di tes
-- Web Audio API dan Notification API di-mock karena tidak tersedia di jsdom
+- `window.matchMedia` di-mock untuk menguji deteksi preferensi OS pada ThemeModule
 - Checkpoint memastikan validasi inkremental sebelum lanjut ke modul berikutnya
 - Semua modul ditulis dalam satu `js/app.js` menggunakan block scope atau IIFE — tidak ada polusi namespace global
 

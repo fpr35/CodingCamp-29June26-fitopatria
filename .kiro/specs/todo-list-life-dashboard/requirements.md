@@ -2,7 +2,7 @@
 
 ## Introduction
 
-To-Do List Life Dashboard adalah aplikasi web single-page berbasis Vanilla HTML, CSS, dan JavaScript yang berfungsi sebagai dashboard produktivitas harian. Aplikasi ini menggabungkan empat fitur inti: Greeting dinamis, Focus Timer (Pomodoro), To-Do List dengan CRUD lengkap, dan Quick Links. Ditambah tiga tantangan: nama pengguna yang bisa dikustomisasi, drag & drop reorder tasks, dan notifikasi/alarm saat timer selesai. Semua data disimpan menggunakan Browser Local Storage API tanpa framework atau library eksternal.
+To-Do List Life Dashboard adalah aplikasi web single-page berbasis Vanilla HTML, CSS, dan JavaScript yang berfungsi sebagai dashboard produktivitas harian. Aplikasi ini menggabungkan empat fitur inti: Greeting dinamis, Focus Timer (Pomodoro), To-Do List dengan CRUD lengkap, dan Quick Links. Ditambah tiga tantangan: nama pengguna yang bisa dikustomisasi, drag & drop reorder tasks, dan tema Light & Dark mode. Semua data disimpan menggunakan Browser Local Storage API tanpa framework atau library eksternal.
 
 ## Glossary
 
@@ -15,7 +15,7 @@ To-Do List Life Dashboard adalah aplikasi web single-page berbasis Vanilla HTML,
 - **Link_Item**: Satu item tautan dalam Quick_Links dengan properti nama dan URL
 - **LocalStorage**: Browser Local Storage API sebagai satu-satunya mekanisme persistensi data
 - **User_Name**: Nama pengguna yang dikustomisasi dan disimpan di LocalStorage
-- **Notification**: Pemberitahuan browser (Web Notifications API) atau sinyal audio yang diputar saat timer selesai
+- **Theme**: Preferensi tampilan pengguna (light/dark) yang disimpan di LocalStorage
 - **Drag_Handle**: Elemen antarmuka yang memungkinkan pengguna menyeret task untuk mengatur ulang urutan
 
 ---
@@ -71,18 +71,20 @@ To-Do List Life Dashboard adalah aplikasi web single-page berbasis Vanilla HTML,
 
 ---
 
-### Requirement 4: Notifikasi/Alarm Saat Timer Selesai
+### Requirement 4: Tema Light & Dark Mode
 
-**User Story:** Sebagai pengguna, saya ingin mendapatkan notifikasi atau alarm ketika sesi fokus berakhir, sehingga saya tidak perlu terus-menerus memantau layar.
+**User Story:** Sebagai pengguna, saya ingin dapat beralih antara tema terang (light) dan gelap (dark) di dashboard, sehingga saya dapat menyesuaikan tampilan sesuai preferensi atau kondisi pencahayaan.
 
 #### Acceptance Criteria
 
-1. WHEN hitungan mundur Focus_Timer mencapai 00:00, THE Focus_Timer SHALL memutar sinyal audio dengan durasi minimal 3 detik sebagai tanda sesi selesai.
-2. WHEN hitungan mundur Focus_Timer mencapai 00:00 dan izin notifikasi browser telah diberikan (`Notification.permission === 'granted'`), THE Focus_Timer SHALL menampilkan Notification browser dengan judul "Sesi Fokus Selesai!" dan pesan "Waktunya istirahat sejenak." yang otomatis tertutup setelah 5 detik.
-3. WHEN pengguna memulai sesi Focus_Timer untuk pertama kali dan izin notifikasi belum pernah diberikan atau ditolak (`Notification.permission === 'default'`), THE Dashboard SHALL menampilkan permintaan izin notifikasi browser kepada pengguna.
-4. IF pengguna menolak izin notifikasi browser (`Notification.permission === 'denied'`), THEN THE Focus_Timer SHALL tetap memutar sinyal audio sebagai alternatif tanpa menampilkan Notification browser.
-5. IF perangkat tidak mendukung Web Notifications API (`typeof Notification === 'undefined'`), THEN THE Focus_Timer SHALL memutar sinyal audio sebagai satu-satunya tanda sesi selesai.
-6. IF sinyal audio gagal diputar karena error browser (misalnya kebijakan autoplay), THEN THE Focus_Timer SHALL menampilkan pesan visual di dashboard yang menyatakan "Sesi selesai! Silakan ambil istirahat." sebagai fallback.
+1. THE Dashboard SHALL menyediakan tombol toggle tema yang dapat diakses dari header halaman.
+2. WHEN pengguna menekan tombol toggle, THE Dashboard SHALL beralih antara tema `dark` dan `light` secara langsung tanpa memuat ulang halaman.
+3. WHEN tema diubah, THE Dashboard SHALL menyimpan preferensi tema ke LocalStorage menggunakan kunci `theme`.
+4. WHEN halaman dimuat, THE Dashboard SHALL membaca kunci `theme` dari LocalStorage dan menerapkan tema yang tersimpan.
+5. WHEN halaman dimuat pertama kali dan kunci `theme` tidak ada di LocalStorage, THE Dashboard SHALL mendeteksi preferensi sistem operasi pengguna melalui `prefers-color-scheme` dan menerapkan tema yang sesuai.
+6. THE Dashboard SHALL menerapkan tema dengan mengatur atribut `data-theme` pada elemen `<html>` dengan nilai `"dark"` atau `"light"`.
+7. WHEN tema aktif adalah `dark`, THE tombol toggle SHALL menampilkan label yang mengindikasikan opsi beralih ke mode terang (contoh: "☀️ Light").
+8. WHEN tema aktif adalah `light`, THE tombol toggle SHALL menampilkan label yang mengindikasikan opsi beralih ke mode gelap (contoh: "🌙 Dark").
 
 ---
 
@@ -186,7 +188,7 @@ To-Do List Life Dashboard adalah aplikasi web single-page berbasis Vanilla HTML,
 #### Acceptance Criteria
 
 1. THE Dashboard SHALL menggunakan LocalStorage sebagai satu-satunya mekanisme penyimpanan data.
-2. WHEN halaman dimuat ulang, THE Dashboard SHALL memulihkan semua Task, Link_Item, User_Name, dan pengaturan dari LocalStorage.
+2. WHEN halaman dimuat ulang, THE Dashboard SHALL memulihkan semua Task, Link_Item, User_Name, preferensi Theme, dan pengaturan dari LocalStorage.
 3. THE Dashboard SHALL menyimpan perubahan data ke LocalStorage segera setelah setiap operasi penambahan, penghapusan, pembaruan, atau perubahan urutan.
 4. IF LocalStorage tidak dapat diakses (misalnya dalam mode private/incognito dengan storage diblokir), THEN THE Dashboard SHALL menampilkan pesan peringatan bahwa data tidak dapat disimpan secara permanen.
 

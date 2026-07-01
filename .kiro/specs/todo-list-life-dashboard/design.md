@@ -2,13 +2,13 @@
 
 ## Overview
 
-**To-Do List Life Dashboard** adalah aplikasi web Single-Page Application (SPA) yang dibangun sepenuhnya dengan Vanilla HTML, CSS, dan JavaScript tanpa framework atau library eksternal. Aplikasi ini berfungsi sebagai dashboard produktivitas harian yang menggabungkan tujuh widget: Greeting dinamis, Kustomisasi Nama, Focus Timer (Pomodoro), Notifikasi/Alarm, To-Do List (CRUD + Drag & Drop), dan Quick Links.
+**To-Do List Life Dashboard** adalah aplikasi web Single-Page Application (SPA) yang dibangun sepenuhnya dengan Vanilla HTML, CSS, dan JavaScript tanpa framework atau library eksternal. Aplikasi ini berfungsi sebagai dashboard produktivitas harian yang menggabungkan tujuh widget: Greeting dinamis, Kustomisasi Nama, Focus Timer (Pomodoro), Tema Light/Dark Mode, To-Do List (CRUD + Drag & Drop), dan Quick Links.
 
 ### Prinsip Desain Utama
 
 - **Zero-dependency**: Tidak ada npm, bundler, atau CDN library — hanya tiga file inti (`index.html`, `css/style.css`, `js/app.js`).
 - **LocalStorage-first**: Semua persistensi data menggunakan `localStorage` browser.
-- **Progressive Enhancement**: Fitur seperti Web Notifications dan Web Audio API degradasi dengan graceful jika tidak didukung.
+- **Progressive Enhancement**: Preferensi tema mengikuti `prefers-color-scheme` OS sebagai fallback.
 - **Single Responsibility per modul**: Setiap widget dikelola oleh modul JavaScript yang terisolasi di dalam satu file `app.js`.
 
 ---
@@ -36,7 +36,7 @@ app.js
 ├── GreetingModule       — menampilkan waktu, tanggal, dan sapaan
 ├── UserNameModule       — kustomisasi nama pengguna
 ├── TimerModule          — Focus Timer (Pomodoro) setInterval
-├── NotificationModule   — Web Audio API + Web Notifications API
+├── ThemeModule          — Light/Dark mode toggle + persistensi localStorage
 ├── TodoModule           — CRUD task + Drag & Drop reorder
 └── QuickLinksModule     — CRUD quick links
 ```
@@ -169,27 +169,28 @@ TimerModule = {
 }
 ```
 
-### 5. NotificationModule
+### 5. ThemeModule
 
-Menangani sinyal audio (Web Audio API) dan notifikasi browser (Web Notifications API).
+Mengelola tema tampilan Light/Dark mode dan persistensinya ke localStorage.
+
+**DOM Elements:**
+- `#theme-toggle-btn` — tombol toggle tema di header
+
+**LocalStorage Key:** `theme`
 
 **Interface:**
 ```javascript
-NotificationModule = {
-  init()              → void   // cek dukungan API
-  requestPermission() → Promise<string>
-  notify()            → void   // dipanggil oleh TimerModule saat 00:00
-  playAudio()         → void   // generate tone via AudioContext
-  showNotification()  → void   // tampilkan browser notification
-  showVisualFallback() → void  // tampilkan pesan di DOM jika audio gagal
+ThemeModule = {
+  init()              → void   // baca preferensi tersimpan / OS, terapkan tema, pasang listener
+  toggle()            → void   // beralih dark↔light, simpan ke localStorage
+  applyTheme(theme)   → void   // set data-theme pada <html>, update label tombol
 }
 ```
 
-**Prioritas saat timer selesai:**
-1. Putar audio (Web Audio API) — selalu dicoba
-2. Tampilkan browser notification jika permission = `granted`
-3. Jika audio gagal → tampilkan fallback visual
-4. Jika permission = `default` → minta izin saat timer mulai pertama kali
+**Logika penentuan tema awal:**
+1. Baca kunci `theme` dari localStorage — jika ada, gunakan nilai tersebut
+2. Jika tidak ada, deteksi `prefers-color-scheme` dari OS
+3. Fallback ke `"dark"` jika tidak ada preferensi yang terdeteksi
 
 ### 6. TodoModule
 
@@ -317,6 +318,7 @@ QuickLinksModule = {
 | `userName` | `string` | Nama pengguna (setelah di-trim) |
 | `tasks` | `string` (JSON) | Array of Task |
 | `quickLinks` | `string` (JSON) | Array of LinkItem |
+| `theme` | `string` | Preferensi tema: `"dark"` atau `"light"` |
 
 ### ID Generation
 
@@ -492,16 +494,14 @@ Output tidak pernah berupa string lain, `null`, atau `undefined`.
 | URL tidak diawali http:// atau https:// | QuickLinksModule | Tampilkan error "URL harus diawali dengan http:// atau https://" |
 | Nama link kosong | QuickLinksModule | Tampilkan error "Nama link tidak boleh kosong" |
 | URL kosong | QuickLinksModule | Tampilkan error "URL tidak boleh kosong" |
-| Web Audio API gagal (autoplay policy) | NotificationModule | Tampilkan fallback visual "Sesi selesai! Silakan ambil istirahat." |
-| Notification API tidak didukung | NotificationModule | Hanya putar audio, tidak ada browser notification |
-| Permission notification ditolak | NotificationModule | Hanya putar audio sebagai alternatif |
+| Nilai `theme` di localStorage tidak valid | ThemeModule | Abaikan, gunakan preferensi OS atau fallback ke `"dark"` |
 
 ### Prinsip Error Handling
 
 1. **Tidak ada error yang melempar exception ke console tanpa ditangkap** — semua `try/catch` mencakup operasi localStorage dan JSON.
 2. **Rollback visual** — jika operasi gagal setelah perubahan DOM, DOM dikembalikan ke state sebelumnya.
 3. **Pesan error langsung dan spesifik** — ditampilkan di dekat elemen yang bermasalah, bukan di console.
-4. **Degradasi graceful** — fitur yang tidak didukung (Web Notifications, Web Audio) tidak memblokir fitur lain.
+4. **Degradasi graceful** — tema mengikuti preferensi OS jika localStorage belum pernah menyimpan pilihan pengguna.
 
 ---
 
@@ -554,7 +554,7 @@ Setiap property test harus diberi tag referensi ke properti desain:
 | StorageManager | `isAvailable()` mock SecurityError, fallback saat setItem gagal |
 | GreetingModule | Tampilan tanpa nama, tampilan dengan nama, locale date format |
 | TimerModule | Start → interval terdaftar, Pause → interval berhenti, Reset → 25:00, format tepat batas (0, 1500) |
-| NotificationModule | permission=granted → notification dipanggil, permission=denied → hanya audio, API tidak ada → audio only |
+| ThemeModule | Toggle dark→light, toggle light→dark, load dari localStorage, fallback ke preferensi OS |
 | TodoModule | Tambah task valid, edit lalu simpan, batalkan edit → teks asli, load data valid, load data JSON invalid |
 | QuickLinksModule | URL valid, empty state message saat list kosong, load dari localStorage |
 
@@ -563,4 +563,4 @@ Setiap property test harus diberi tag referensi ke properti desain:
 - Modul JavaScript diekspos sebagai pure functions yang dapat diimpor/di-stub secara independen.
 - DOM testing menggunakan `jsdom` (disertakan dalam Vitest/Jest secara bawaan).
 - localStorage di-mock menggunakan `localStorage.setItem = jest.fn()` atau `vi.stubGlobal`.
-- Web Audio API dan Notification API di-mock karena tidak tersedia di jsdom.
+- `window.matchMedia` di-mock untuk menguji deteksi preferensi OS pada ThemeModule.

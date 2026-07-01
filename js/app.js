@@ -399,7 +399,6 @@ const TimerModule = {
    *      - Hentikan interval
    *      - Set isRunning = false
    *      - Kembalikan tombol ke kondisi awal
-   *      - Panggil NotificationModule.notify() (tersedia saat runtime, Task 7)
    *
    * Requirements: 3.3, 3.6
    */
