@@ -10,6 +10,13 @@
     <title>To-Do List Life Dashboard</title>
     <!-- Requirements 12.2: tepat satu file CSS di /css/ -->
     <link rel="stylesheet" href="css/style.css" />
+    <!-- Google Fonts: Fraunces (display), Inter (body), IBM Plex Mono (mono) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,340;9..144,480;9..144,600&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@500;600&display=swap"
+      rel="stylesheet"
+    />
   </head>
 
   <body>
@@ -37,6 +44,7 @@
          ================================================================= -->
     <header class="site-header">
       <div class="site-header__brand">
+        <p class="site-eyebrow">Dasbor Harian</p>
         <h1 class="site-title">Life Dashboard</h1>
       </div>
 
@@ -55,14 +63,17 @@
         aria-label="Sapaan dan Waktu"
       >
         <!-- Waktu saat ini dalam format HH:MM (24-jam) -->
-        <p
-          id="greeting-time"
-          class="greeting-time"
-          aria-label="Waktu saat ini"
-          aria-live="off"
-        >
-          --:--
-        </p>
+        <div class="greeting-time-row">
+          <span class="period-orb" aria-hidden="true"></span>
+          <p
+            id="greeting-time"
+            class="greeting-time"
+            aria-label="Waktu saat ini"
+            aria-live="off"
+          >
+            --:--
+          </p>
+        </div>
 
         <!-- Tanggal lengkap: nama hari, tanggal, nama bulan, tahun -->
         <p

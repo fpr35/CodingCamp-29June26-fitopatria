@@ -59,6 +59,19 @@ function generateId(prefix) {
 
 const GreetingModule = {
   /**
+   * Mengembalikan slug periode waktu berdasarkan jam (0–23).
+   * Dipakai untuk mengatur atribut data-period pada <html> (Period Orb styling).
+   * @param {number} hour
+   * @returns {'pagi'|'siang'|'sore'|'malam'}
+   */
+  getPeriodSlug(hour) {
+    if (hour >= 0 && hour <= 11) return 'pagi';
+    if (hour >= 12 && hour <= 14) return 'siang';
+    if (hour >= 15 && hour <= 17) return 'sore';
+    return 'malam';
+  },
+
+  /**
    * Mengembalikan string sapaan berdasarkan jam (0–23).
    * @param {number} hour - Jam saat ini (integer, 0–23)
    * @returns {string} Salah satu dari: "Selamat Pagi", "Selamat Siang",
@@ -81,6 +94,9 @@ const GreetingModule = {
     const now = new Date();
     const hour = now.getHours();
     const minutes = now.getMinutes();
+
+    // Set period orb via data-period attribute on <html>
+    document.documentElement.setAttribute('data-period', this.getPeriodSlug(hour));
 
     // Format waktu HH:MM dengan zero-padding
     const timeStr =
